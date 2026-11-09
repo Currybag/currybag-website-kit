@@ -1,0 +1,48 @@
+{
+  "name": "@currybag/website-kit",
+  "version": "0.1.0",
+  "description": "Shared platform UI for Currybag marketing sites (lovinglanka, einfall, …).",
+  "license": "UNLICENSED",
+  "private": false,
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./env-switch": {
+      "types": "./dist/env-switch.d.ts",
+      "import": "./dist/env-switch.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepare": "pnpm run build"
+  },
+  "peerDependencies": {
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=20 <23"
+  },
+  "packageManager": "pnpm@10.27.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Currybag/currybag-website-kit.git"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  }
+}
