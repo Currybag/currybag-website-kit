@@ -2,7 +2,7 @@
 
 Shared platform UI for Currybag marketing sites (`lovinglanka-website`, `einfall-website`, …).
 
-Brand copy, nav, tokens, and pages stay in each site. Only infra-alike pieces live here.
+Public so DO/CI can install via `github:` without a registry token. Brand copy, nav, tokens, and pages stay in each site. Only infra-alike pieces live here.
 
 ## Install
 
