@@ -7,7 +7,7 @@ Public so DO/CI can install via `github:` without a registry token. Brand copy, 
 ## Install
 
 ```bash
-pnpm add github:Currybag/currybag-website-kit#v0.2.0
+pnpm add github:Currybag/currybag-website-kit#v0.2.1
 ```
 
 Pin a semver tag and bump consciously in each consumer.
@@ -21,11 +21,10 @@ import { EnvSwitch } from "@currybag/website-kit/env-switch";
   localOrigin="http://localhost:3001"
   liveOrigin={site.origin}
   requireStaff
-  staffEnabled={staffEnabled}
 />
 ```
 
-On localhost the switch always shows. On live, pass `staffEnabled` from the staff-bridge cookie session.
+On localhost the switch always shows. On live it fetches `/api/staff-bridge/status` (`{ ok: true }` only after admin bridge).
 
 Expects optional CSS variables `--bg` and `--ink-soft` on the host (both marketing sites define them).
 

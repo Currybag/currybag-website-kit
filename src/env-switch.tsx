@@ -8,12 +8,15 @@ export interface EnvSwitchProps {
   /** Production origin, e.g. https://lovinglanka.ch */
   liveOrigin: string;
   /**
-   * When true (default), hide on non-local origins unless `staffEnabled`.
+   * When true (default), hide on non-local origins unless staff status is ok.
    * Localhost / 127.0.0.1 / 0.0.0.0 always show.
    */
   requireStaff?: boolean;
-  /** Server-resolved staff bridge cookie session (live only). */
-  staffEnabled?: boolean;
+  /**
+   * Same-origin status endpoint returning `{ ok: boolean }`.
+   * Default: `/api/staff-bridge/status`
+   */
+  staffStatusUrl?: string;
   className?: string;
   style?: CSSProperties;
 }
@@ -74,30 +77,51 @@ const linkStyle: CSSProperties = {
 
 /**
  * Live ↔ Local origin hop (path/search/hash preserved).
- * Uses CSS vars `--bg` / `--ink-soft` when the host site defines them.
+ * On live, gated by staff-bridge status fetch (avoids static RSC baking).
  */
 export function EnvSwitch({
   localOrigin,
   liveOrigin,
   requireStaff = true,
-  staffEnabled = false,
+  staffStatusUrl = "/api/staff-bridge/status",
   className,
   style,
 }: EnvSwitchProps) {
   const [target, setTarget] = useState<EnvSwitchTarget | null>(null);
-  const [allowed, setAllowed] = useState(!requireStaff);
+  const [allowed, setAllowed] = useState(false);
 
   useEffect(() => {
     const { origin } = window.location;
+    setTarget(resolveEnvSwitchTarget(localOrigin, liveOrigin));
+
     if (isLocalOrigin(origin)) {
       setAllowed(true);
-    } else if (requireStaff) {
-      setAllowed(staffEnabled);
-    } else {
-      setAllowed(true);
+      return;
     }
-    setTarget(resolveEnvSwitchTarget(localOrigin, liveOrigin));
-  }, [localOrigin, liveOrigin, requireStaff, staffEnabled]);
+
+    if (!requireStaff) {
+      setAllowed(true);
+      return;
+    }
+
+    let cancelled = false;
+    fetch(staffStatusUrl, { credentials: "same-origin" })
+      .then(async (res) => {
+        if (!res.ok) return false;
+        const data = (await res.json()) as { ok?: unknown };
+        return data.ok === true;
+      })
+      .then((ok) => {
+        if (!cancelled) setAllowed(ok);
+      })
+      .catch(() => {
+        if (!cancelled) setAllowed(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [localOrigin, liveOrigin, requireStaff, staffStatusUrl]);
 
   if (!allowed || !target) return null;
 

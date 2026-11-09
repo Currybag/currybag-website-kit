@@ -43,24 +43,42 @@ const linkStyle = {
 };
 /**
  * Live ↔ Local origin hop (path/search/hash preserved).
- * Uses CSS vars `--bg` / `--ink-soft` when the host site defines them.
+ * On live, gated by staff-bridge status fetch (avoids static RSC baking).
  */
-export function EnvSwitch({ localOrigin, liveOrigin, requireStaff = true, staffEnabled = false, className, style, }) {
+export function EnvSwitch({ localOrigin, liveOrigin, requireStaff = true, staffStatusUrl = "/api/staff-bridge/status", className, style, }) {
     const [target, setTarget] = useState(null);
-    const [allowed, setAllowed] = useState(!requireStaff);
+    const [allowed, setAllowed] = useState(false);
     useEffect(() => {
         const { origin } = window.location;
+        setTarget(resolveEnvSwitchTarget(localOrigin, liveOrigin));
         if (isLocalOrigin(origin)) {
             setAllowed(true);
+            return;
         }
-        else if (requireStaff) {
-            setAllowed(staffEnabled);
-        }
-        else {
+        if (!requireStaff) {
             setAllowed(true);
+            return;
         }
-        setTarget(resolveEnvSwitchTarget(localOrigin, liveOrigin));
-    }, [localOrigin, liveOrigin, requireStaff, staffEnabled]);
+        let cancelled = false;
+        fetch(staffStatusUrl, { credentials: "same-origin" })
+            .then(async (res) => {
+            if (!res.ok)
+                return false;
+            const data = (await res.json());
+            return data.ok === true;
+        })
+            .then((ok) => {
+            if (!cancelled)
+                setAllowed(ok);
+        })
+            .catch(() => {
+            if (!cancelled)
+                setAllowed(false);
+        });
+        return () => {
+            cancelled = true;
+        };
+    }, [localOrigin, liveOrigin, requireStaff, staffStatusUrl]);
     if (!allowed || !target)
         return null;
     const label = target.toLive ? "Live" : "Local";
