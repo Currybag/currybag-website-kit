@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@types/node':
+        specifier: ^26.6.6
+        version: 26.6.6
       '@types/react':
         specifier: ^19
         version: 19.3.0
@@ -25,6 +28,9 @@ importers:
         version: 5.9.3
 
 packages:
+
+  '@types/node@26.6.6':
+    resolution: {integrity: sha512-MzQj+8Kx3XI40OmUAE6Qoh58ZMNstNNMwn2nfd3qWsfe7nDNSqJNzes4njhz6AHwrSHOffSLwXU6yb474Q4aog==}
 
   '@types/react-dom@19.3.0':
     resolution: {integrity: sha512-ZI7bU42mZXXKHn/qNLEw2IrbiINU7X5+vfgdixBHkCNpYWXjKgfQ/P+uyGb5CjOLB9UcnTeg3rylQtV2hym44Q==}
@@ -54,7 +60,14 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  undici-types@8.9.0:
+    resolution: {integrity: sha512-KTDyRTYX8sWmKXAikPHHSyc63CRPETMctyjKFupcC6OBLXT3xsN0e9aF7m+mIXutFWpUXuedtowG7iLOzp0kQg==}
+
 snapshots:
+
+  '@types/node@26.6.6':
+    dependencies:
+      undici-types: 8.9.0
 
   '@types/react-dom@19.3.0(@types/react@19.3.0)':
     dependencies:
@@ -76,3 +89,5 @@ snapshots:
   scheduler@0.28.0: {}
 
   typescript@5.9.3: {}
+
+  undici-types@8.9.0: {}

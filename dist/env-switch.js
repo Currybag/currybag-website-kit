@@ -45,12 +45,23 @@ const linkStyle = {
  * Live ↔ Local origin hop (path/search/hash preserved).
  * Uses CSS vars `--bg` / `--ink-soft` when the host site defines them.
  */
-export function EnvSwitch({ localOrigin, liveOrigin, className, style, }) {
+export function EnvSwitch({ localOrigin, liveOrigin, requireStaff = true, staffEnabled = false, className, style, }) {
     const [target, setTarget] = useState(null);
+    const [allowed, setAllowed] = useState(!requireStaff);
     useEffect(() => {
+        const { origin } = window.location;
+        if (isLocalOrigin(origin)) {
+            setAllowed(true);
+        }
+        else if (requireStaff) {
+            setAllowed(staffEnabled);
+        }
+        else {
+            setAllowed(true);
+        }
         setTarget(resolveEnvSwitchTarget(localOrigin, liveOrigin));
-    }, [localOrigin, liveOrigin]);
-    if (!target)
+    }, [localOrigin, liveOrigin, requireStaff, staffEnabled]);
+    if (!allowed || !target)
         return null;
     const label = target.toLive ? "Live" : "Local";
     return (_jsx("p", { className: className, style: { ...defaultStyle, ...style }, children: _jsx("a", { href: target.href, title: label, style: linkStyle, children: label }) }));

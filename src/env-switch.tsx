@@ -7,6 +7,13 @@ export interface EnvSwitchProps {
   localOrigin: string;
   /** Production origin, e.g. https://lovinglanka.ch */
   liveOrigin: string;
+  /**
+   * When true (default), hide on non-local origins unless `staffEnabled`.
+   * Localhost / 127.0.0.1 / 0.0.0.0 always show.
+   */
+  requireStaff?: boolean;
+  /** Server-resolved staff bridge cookie session (live only). */
+  staffEnabled?: boolean;
   className?: string;
   style?: CSSProperties;
 }
@@ -72,16 +79,27 @@ const linkStyle: CSSProperties = {
 export function EnvSwitch({
   localOrigin,
   liveOrigin,
+  requireStaff = true,
+  staffEnabled = false,
   className,
   style,
 }: EnvSwitchProps) {
   const [target, setTarget] = useState<EnvSwitchTarget | null>(null);
+  const [allowed, setAllowed] = useState(!requireStaff);
 
   useEffect(() => {
+    const { origin } = window.location;
+    if (isLocalOrigin(origin)) {
+      setAllowed(true);
+    } else if (requireStaff) {
+      setAllowed(staffEnabled);
+    } else {
+      setAllowed(true);
+    }
     setTarget(resolveEnvSwitchTarget(localOrigin, liveOrigin));
-  }, [localOrigin, liveOrigin]);
+  }, [localOrigin, liveOrigin, requireStaff, staffEnabled]);
 
-  if (!target) return null;
+  if (!allowed || !target) return null;
 
   const label = target.toLive ? "Live" : "Local";
 

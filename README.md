@@ -7,7 +7,7 @@ Public so DO/CI can install via `github:` without a registry token. Brand copy, 
 ## Install
 
 ```bash
-pnpm add github:Currybag/currybag-website-kit#v0.1.1
+pnpm add github:Currybag/currybag-website-kit#v0.2.0
 ```
 
 Pin a semver tag and bump consciously in each consumer.
@@ -17,10 +17,29 @@ Pin a semver tag and bump consciously in each consumer.
 ```tsx
 import { EnvSwitch } from "@currybag/website-kit/env-switch";
 
-<EnvSwitch localOrigin="http://localhost:3001" liveOrigin={site.origin} />
+<EnvSwitch
+  localOrigin="http://localhost:3001"
+  liveOrigin={site.origin}
+  requireStaff
+  staffEnabled={staffEnabled}
+/>
 ```
 
+On localhost the switch always shows. On live, pass `staffEnabled` from the staff-bridge cookie session.
+
 Expects optional CSS variables `--bg` and `--ink-soft` on the host (both marketing sites define them).
+
+## Staff bridge (server-only)
+
+```ts
+import {
+  verifyStaffBridgeToken,
+  signStaffSessionToken,
+  resolveStaffBridgeHmacSecret,
+} from "@currybag/website-kit/staff-bridge";
+```
+
+Uses `STAFF_BRIDGE_HMAC_SECRET` (same value as currybag-erp). Do not import this entry from client components (`node:crypto`).
 
 ## Develop
 
