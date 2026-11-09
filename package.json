@@ -1,6 +1,6 @@
 {
   "name": "@currybag/website-kit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Shared platform UI for Currybag marketing sites (lovinglanka, einfall, …).",
   "license": "UNLICENSED",
   "private": false,
@@ -20,8 +20,7 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "prepare": "pnpm run build"
+    "build": "tsc -p tsconfig.json"
   },
   "peerDependencies": {
     "react": ">=19",

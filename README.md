@@ -7,7 +7,7 @@ Brand copy, nav, tokens, and pages stay in each site. Only infra-alike pieces li
 ## Install
 
 ```bash
-pnpm add github:Currybag/currybag-website-kit#v0.1.0
+pnpm add github:Currybag/currybag-website-kit#v0.1.1
 ```
 
 Pin a semver tag and bump consciously in each consumer.
