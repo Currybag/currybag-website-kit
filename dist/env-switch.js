@@ -49,8 +49,32 @@ export function EnvSwitch({ localOrigin, liveOrigin, requireStaff = true, staffS
     const [target, setTarget] = useState(null);
     const [allowed, setAllowed] = useState(false);
     useEffect(() => {
+        const syncTarget = () => {
+            setTarget(resolveEnvSwitchTarget(localOrigin, liveOrigin));
+        };
+        syncTarget();
+        window.addEventListener("popstate", syncTarget);
+        window.addEventListener("hashchange", syncTarget);
+        const { pushState, replaceState } = history;
+        history.pushState = function (...args) {
+            const result = pushState.apply(this, args);
+            syncTarget();
+            return result;
+        };
+        history.replaceState = function (...args) {
+            const result = replaceState.apply(this, args);
+            syncTarget();
+            return result;
+        };
+        return () => {
+            window.removeEventListener("popstate", syncTarget);
+            window.removeEventListener("hashchange", syncTarget);
+            history.pushState = pushState;
+            history.replaceState = replaceState;
+        };
+    }, [localOrigin, liveOrigin]);
+    useEffect(() => {
         const { origin } = window.location;
-        setTarget(resolveEnvSwitchTarget(localOrigin, liveOrigin));
         if (isLocalOrigin(origin)) {
             setAllowed(true);
             return;
@@ -78,7 +102,7 @@ export function EnvSwitch({ localOrigin, liveOrigin, requireStaff = true, staffS
         return () => {
             cancelled = true;
         };
-    }, [localOrigin, liveOrigin, requireStaff, staffStatusUrl]);
+    }, [requireStaff, staffStatusUrl]);
     if (!allowed || !target)
         return null;
     const label = target.toLive ? "Live" : "Local";
